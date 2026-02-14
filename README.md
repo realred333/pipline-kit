@@ -3,8 +3,23 @@
 기존 코드베이스 개선(Enhancement)을 **안전하게 반복**하기 위한 프롬프트 세트.
 
 ## 빠른 시작
-- 프로젝트 루트에 `enhancement_generic/` 폴더로 클론해 둔다.
+- 이 레포는 **범용**이다. 어떤 프로젝트든 가져다 써도 된다.
+- 사용 시 권장 규칙: 프로젝트 루트에 폴더명을 **항상** `enhancement_generic/`로 둔다.
+  - (프롬프트들이 `./enhancement_generic/...` 경로를 기준으로 참조함)
 - 추천 엔트리포인트: `AUTOPILOT.prompt`
+
+### 설치 방법(프로젝트별)
+아래 중 하나를 선택:
+1) Git submodule (팀/재현성에 가장 좋음)
+```bash
+git submodule add <REPO_URL> enhancement_generic
+git submodule update --init --recursive
+```
+2) 단순 클론 + 메인 레포에서 무시(개인 로컬용)
+```bash
+git clone <REPO_URL> enhancement_generic
+```
+메인 프로젝트의 `.gitignore`에 `enhancement_generic/`를 추가하면 커밋에 섞이지 않는다.
 
 ## 트랙 (3)
 1. `KICKOFF`
