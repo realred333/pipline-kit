@@ -1,5 +1,5 @@
 공통 선행 규칙:
-- 시작 전에 반드시 `./enhancement_generic/0_PROCESS_CONCERNS.md`를 먼저 읽는다.
+- 시작 전에 반드시 `./pipline-kit/0_PROCESS_CONCERNS.md`를 먼저 읽는다.
 - 규칙과 현재 프롬프트가 충돌하면 0번 규칙을 우선한다.
 
 너는 문서 통합 담당이다.
