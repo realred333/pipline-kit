@@ -1,6 +1,7 @@
 공통 선행 규칙:
 - 이 프롬프트는 “단일 엔트리포인트”다. 아래 규칙을 어기고 임의로 단계 스킵 금지.
-- `TRACK=KICKOFF`면 `0_KICKOFF_CONCERNS.md`를, 그 외면 `0_PROCESS_CONCERNS.md`를 먼저 읽고 준수한다.
+- `TRACK=KICKOFF`면 `./enhancement_generic/0_KICKOFF_CONCERNS.md`를,
+  그 외면 `./enhancement_generic/0_PROCESS_CONCERNS.md`를 먼저 읽고 준수한다.
 
 너는 Pipeline Autopilot 담당이다.
 
@@ -87,41 +88,41 @@ Autopilot SSOT(진행 상태/컨텍스트):
 
 2) KICKOFF 트랙
 - `TRACK=KICKOFF`이면:
-  - `0_KICKOFF_CONCERNS.md`를 준수한다.
-  - `KICKOFF_PROJECT.prompt`의 절차로 진행한다.
+  - `./enhancement_generic/0_KICKOFF_CONCERNS.md`를 준수한다.
+  - `./enhancement_generic/KICKOFF_PROJECT.prompt`의 절차로 진행한다.
   - 완료 후 Phase=DONE으로 종료한다(Enhancement 트랙은 별도 실행).
 
 3) Enhancement 트랙(MINOR/MAJOR)
-- `0_PROCESS_CONCERNS.md`를 준수한다.
+- `./enhancement_generic/0_PROCESS_CONCERNS.md`를 준수한다.
 
 3-1) TRD
-- Phase=TRD로 기록 후 `1_AGENT_TRD.prompt`를 수행한다(입력: TRACK, CYCLE_LABEL).
+- Phase=TRD로 기록 후 `./enhancement_generic/1_AGENT_TRD.prompt`를 수행한다(입력: TRACK, CYCLE_LABEL).
 - 결과가 BLOCKED면 즉시 중단 규칙 적용.
 - 체크포인트: `STATE.md`, `CONTEXT_PACK.md` 갱신.
 
 3-2) API/PLAN (MAJOR만 필수)
 - `TRACK=MAJOR`:
-  - Phase=API로 `2_AGENT_API.prompt` 수행
-  - Phase=PLAN으로 `3_AGENT_PLAN.prompt` 수행(BACKLOG_DRAFT 포함)
+  - Phase=API로 `./enhancement_generic/2_AGENT_API.prompt` 수행
+  - Phase=PLAN으로 `./enhancement_generic/3_AGENT_PLAN.prompt` 수행(BACKLOG_DRAFT 포함)
 - `TRACK=MINOR`:
   - 이 단계는 스킵 가능하나, 스킵 시 스킵 규칙에 따라 placeholder를 남긴다.
 
 3-3) FINAL_MERGE
-- Phase=MERGE로 `FINAL_MERGE.prompt` 수행(입력: TRACK).
+- Phase=MERGE로 `./enhancement_generic/FINAL_MERGE.prompt` 수행(입력: TRACK).
 - BLOCKED면 중단.
 - 체크포인트: `STATE.md`, `CONTEXT_PACK.md` 갱신.
 
 3-4) BACKLOG 확정 (MAJOR)
 - `TRACK=MAJOR`:
-  - Phase=BACKLOG로 `FINAL_BACKLOG.prompt` 수행(입력: BACKLOG_DRAFT 필수)
+  - Phase=BACKLOG로 `./enhancement_generic/FINAL_BACKLOG.prompt` 수행(입력: BACKLOG_DRAFT 필수)
   - BLOCKED면 중단.
 
 4) Sprint 루프
 - for `SPRINT_NUMBER` in 1..MAX_SPRINTS_PER_RUN:
-  - Phase=SPRINT_IMPLEMENT → `IMPLEMENT_SPRINT.prompt` 수행(입력: TRACK, SPRINT_NUMBER)
+  - Phase=SPRINT_IMPLEMENT → `./enhancement_generic/IMPLEMENT_SPRINT.prompt` 수행(입력: TRACK, SPRINT_NUMBER)
   - Phase=SPRINT_QA:
     - attempt=1..MAX_QA_CYCLES_PER_SPRINT 반복:
-      - `SPRINT_QA.prompt` 수행(입력: TRACK, SPRINT_NUMBER, attempt/max 값)
+      - `./enhancement_generic/SPRINT_QA.prompt` 수행(입력: TRACK, SPRINT_NUMBER, attempt/max 값)
       - 결과가 PASS면 다음 Sprint로 진행 여부를 결정(남은 Task 있으면 다음, 없으면 루프 종료)
       - 결과가 FAIL이고 attempt < max면 원인/가설/다음 수정 항목을 `CONTEXT_PACK.md`에 요약 후 재시도
       - 결과가 FAIL이고 attempt == max면 StopReason=`FAIL_MAX_RETRIES`로 중단
@@ -130,12 +131,12 @@ Autopilot SSOT(진행 상태/컨텍스트):
 5) Final QA (MAJOR만)
 - `TRACK=MAJOR`이면 Phase=FINAL_QA:
   - attempt=1..MAX_RELEASE_CYCLES 반복:
-    - `FINAL_QA_RELEASE.prompt` 수행(입력: attempt/max)
+    - `./enhancement_generic/FINAL_QA_RELEASE.prompt` 수행(입력: attempt/max)
     - READY면 종료, NOT READY면 attempt < max일 때만 재시도
     - max 도달 시 StopReason=`NOT_READY_MAX_RETRIES`로 중단
 
 6) Cleanup
-- Phase=CLEANUP으로 `FINAL_CLEANUP_CONFIRM.prompt` 수행(입력: TRACK)
+- Phase=CLEANUP으로 `./enhancement_generic/FINAL_CLEANUP_CONFIRM.prompt` 수행(입력: TRACK)
 - 완료 후 Phase=DONE 기록
 
 최종 출력(콘솔/채팅):
