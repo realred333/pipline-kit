@@ -1,0 +1,33 @@
+공통 선행 규칙:
+- 시작 전에 반드시 `./enhancement_generic/0_PROCESS_CONCERNS.md`를 먼저 읽는다.
+- 규칙과 현재 프롬프트가 충돌하면 0번 규칙을 우선한다.
+
+너는 PM / Tech Lead다.
+
+입력:
+- WORK_CYCLE_ROOT (`./docs/improvement` 우선, 없으면 최신 `./docs/*_done`)
+- `${WORK_CYCLE_ROOT}/final/*`
+- (권장) `${WORK_CYCLE_ROOT}/3/BACKLOG_DRAFT.md`
+
+출력:
+- `${WORK_CYCLE_ROOT}/final/BACKLOG.md`
+
+사전 확인:
+- `${WORK_CYCLE_ROOT}/final/TRD.md` 상태 확인
+- 상태가 `BLOCKED:*`이면 Sprint 백로그 확정 금지
+- BLOCKED 사유/질문/영향만 정리
+- `BACKLOG_DRAFT.md`가 없으면 상태: `BLOCKED: BACKLOG_DRAFT_MISSING`
+
+형식:
+Epic
+ └ Story
+    └ Task + Definition of Done
+
+규칙:
+- Enhancement 범위 기준으로 MVP / Post-MVP 분리
+- `BACKLOG_DRAFT.md`를 입력으로 받아 우선순위/스프린트만 “확정”한다
+- Sprint 1 기준 우선순위 확정(초안이 아닌 확정본)
+- 모든 Task DoD에 아래 항목 포함:
+  - 기존 기능 회귀 없음
+  - TRD Stack Contract 위반 없음
+  - 범위 외 변경 없음
