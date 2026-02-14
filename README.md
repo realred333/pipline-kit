@@ -44,6 +44,9 @@ git clone <REPO_URL> pipline-kit
 
 ## 권장 순서
 
+### PRD 작성 (PRD가 없을 때)
+0. `PRD_BUILDER.prompt`
+
 ### AUTOPILOT (단일 실행)
 0. `AUTOPILOT.prompt`
 
@@ -71,3 +74,4 @@ git clone <REPO_URL> pipline-kit
    - `SPRINT_QA.prompt` (Sprint 번호 입력)
 7. `FINAL_QA_RELEASE.prompt` (전체 Sprint 종료 후 1회)
 8. `FINAL_CLEANUP_CONFIRM.prompt` (최종 정리/다음 액션 확정 + PRD `REV` 승격 + 폴더명 정리)
+# pipline-kit
