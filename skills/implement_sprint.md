@@ -1,0 +1,55 @@
+# 스킬: Implement Sprint (스프린트 구현)
+
+> **역할:** 구현 담당 에이전트
+> **선행 조건:** 반드시 `skills/0_process_concerns.md`를 먼저 읽는다. 규칙 충돌 시 0번 규칙 우선.
+
+## 🎯 목표
+- 주어진 Sprint 번호의 Task만 구현한다.
+- 기존 코드 수정 우선 (대규모 재작성 금지).
+- TRD/Stack Contract 외 신규 스택 도입 금지.
+
+## 📥 입력
+- `TRACK` (기본값: `MAJOR`, 옵션: `MINOR`)
+- `SPRINT_NUMBER` (예: 1, 2, 3...)
+- WORK_CYCLE_ROOT (`./docs/improvement` 우선, 없으면 최신 `./docs/*_done`)
+- 기존 코드베이스 전체
+- (선택) `${WORK_CYCLE_ROOT}/final/*`
+
+## 📥 문서 소스 우선순위
+- TRD: `${WORK_CYCLE_ROOT}/final/TRD.md`가 있으면 그걸 사용, 없으면 `${WORK_CYCLE_ROOT}/1/TRD.md`
+- API_SPEC: `${WORK_CYCLE_ROOT}/final/API_SPEC.md` (MAJOR는 필수, MINOR는 선택)
+- BACKLOG: `${WORK_CYCLE_ROOT}/final/BACKLOG.md` (MAJOR는 필수, MINOR는 선택)
+
+## 🚨 사전 검증 (하드 게이트)
+1. **TRD 상태 확인**
+   - TRD 상태가 `READY_FOR_IMPLEMENTATION`이 아니면 구현 금지
+2. **Stack Contract 완결성**
+   - `<UNDECIDED>`가 있으면 구현 금지
+3. **코드베이스 정합성**
+   - 현재 코드와 TRD Stack Contract 불일치 시 구현 금지(불일치 목록/질문 출력)
+4. **TRACK별 필수 문서**
+   - `TRACK=MAJOR`인데 `API_SPEC` 또는 `BACKLOG`가 없으면 `BLOCKED: DOC_MISSING`으로 종료
+
+## 📌 Sprint 범위 결정
+- `TRACK=MAJOR`: `${WORK_CYCLE_ROOT}/final/BACKLOG.md`에서 `Sprint {SPRINT_NUMBER}` Task만 가져옴
+- `TRACK=MINOR`:
+  - BACKLOG가 있으면 동일하게 사용
+  - BACKLOG가 없으면 TRD에 `Sprint {SPRINT_NUMBER} Scope`(Task + DoD)가 반드시 있어야 함
+  - 없으면 `BLOCKED: SPRINT_SCOPE_MISSING`으로 종료
+
+## 🚫 규칙
+- Sprint {SPRINT_NUMBER} Task만 구현한다.
+- Task 단위: **구현 → 테스트 → 요약.**
+- 변경은 기존 코드 수정 우선(대규모 재작성 금지).
+- TRD/Stack Contract 외 신규 스택 도입 금지.
+- 범위 외 기능 추가 금지(발견 즉시 문서의 BACKLOG/OPEN_QUESTIONS로 이동).
+
+## 📤 출력
+- 실제 코드 반영 (게이트 통과 시)
+- 변경 요약(무엇/왜/검증 근거)
+- 게이트 실패 시: 차단 사유 + 질문/불일치 목록
+
+## 🔗 하니스 연동 (랄프 루프 사용 시)
+- 구현 완료 후 → 다음 루프에서 `skills/sprint_qa.md` 호출하여 QA 수행
+- `context/3_checklist.md`의 Sprint N 구현 항목을 `[x]`로 마킹
+- `context/2_context_note.md`에 변경 요약 및 발견된 이슈 기록
