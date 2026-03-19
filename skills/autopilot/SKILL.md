@@ -14,6 +14,8 @@ description: This skill should be used when the user invokes "/autopilot", wants
 /autopilot TRACK=MINOR
 /autopilot TRACK=MAJOR CYCLE_LABEL=cycle-name-YYYYMMDD
 /autopilot TRACK=KICKOFF
+/autopilot TRACK=DESIGN CYCLE_LABEL=cycle-name-YYYYMMDD
+/autopilot TRACK=BUILD
 ```
 
 ## 워크플로우
@@ -43,7 +45,7 @@ If any context/ file is missing:
 Read `./docs/improvement/final/STATE.md` if it exists. If not, treat as new cycle (Phase = INIT).
 
 Parse arguments from the command:
-- `TRACK`: `KICKOFF` | `MINOR` | `MAJOR` (default: `MAJOR`)
+- `TRACK`: `KICKOFF` | `MINOR` | `MAJOR` | `DESIGN` | `BUILD` (default: `MAJOR`)
 - `CYCLE_LABEL`: optional (default: `cycle-YYYYMMDD`)
 
 Validate `TRACK` against the allowlist. If invalid, use `MAJOR` and notify the user.
@@ -114,10 +116,22 @@ Output:
 
 | 상황 | 명령어 |
 |------|--------|
-| 신규 대형 기능 | `/autopilot TRACK=MAJOR CYCLE_LABEL=cycle-feature-20260318` |
+| 신규 대형 기능 (Claude 혼자) | `/autopilot TRACK=MAJOR CYCLE_LABEL=cycle-feature-YYYYMMDD` |
 | 작은 버그 수정 | `/autopilot TRACK=MINOR` |
 | 중단된 사이클 재개 | `/autopilot` (STATE.md 자동 읽기) |
 | 새 프로젝트 시작 | `/autopilot TRACK=KICKOFF` |
+| Codex 병렬 투입 — 설계 단계 | `/autopilot TRACK=DESIGN CYCLE_LABEL=cycle-feature-YYYYMMDD` |
+| Codex 병렬 투입 — 구현 단계 | `/autopilot TRACK=BUILD` (DESIGN 완료 후) |
+
+## PUMASI 흐름
+
+```
+1. /autopilot TRACK=DESIGN   → Claude가 설계 완료 (TRD→BACKLOG)
+                                     "BACKLOG 확정. Codex 투입 준비됨" 메시지 출력
+2. (BACKLOG 검토 후)
+3. /autopilot TRACK=BUILD  → 각 Sprint Task를 Agent 병렬 투입
+                                     결과 통합 → QA → Cleanup
+```
 
 ## References
 - **`../../AUTOPILOT.prompt`** — 오토파일럿 메인 로직 (상태 머신 전체)

@@ -16,8 +16,10 @@
   - 1순위: 사용자가 제공한 PRD 파일 경로
   - 2순위: 리포에서 최신 `PRD_REV{N}.md`, 없으면 최신 `PRD_*.md`
   - PRD 자체가 없으면 `BLOCKED: PRD_REQUIRED`
-- (선택) `TRACK` (`KICKOFF` | `MINOR` | `MAJOR`)
+- (선택) `TRACK` (`KICKOFF` | `MINOR` | `MAJOR` | `DESIGN` | `BUILD`)
   - 미지정 시 기본값은 `MAJOR`
+  - `DESIGN`: Claude가 설계(TRD→BACKLOG)만 완료하고 종료 — Codex 투입 전 준비 단계
+  - `BUILD`: BACKLOG 확정 상태에서 Sprint 병렬 구현 시작 — Codex 워커 활용
 - (선택) `CYCLE_LABEL`
 - (선택) 상한값(미지정 시 기본값 사용):
   - `MAX_SPRINTS_PER_RUN` (기본: 4)
@@ -35,7 +37,7 @@ Autopilot SSOT(진행 상태/컨텍스트):
 - 이 2개는 “대화 컨텍스트”가 아니라 “파일”을 SSOT로 삼기 위한 장치다.
 
 `STATE.md` 필수 스키마(최소):
-- Track: KICKOFF/MINOR/MAJOR
+- Track: KICKOFF/MINOR/MAJOR/DESIGN/BUILD
 - Phase: (KICKOFF | TRD | API | PLAN | MERGE | BACKLOG | SPRINT_IMPLEMENT | SPRINT_QA | FINAL_QA | CLEANUP | DONE | BLOCKED)
 - Current Sprint: N
 - Attempts:
@@ -138,6 +140,32 @@ Autopilot SSOT(진행 상태/컨텍스트):
 6) Cleanup
 - Phase=CLEANUP으로 `./pipline-kit/FINAL_CLEANUP_CONFIRM.prompt` 수행(입력: TRACK)
 - 완료 후 Phase=DONE 기록
+
+---
+
+A) DESIGN 트랙 (설계 전용 — Codex 투입 전 준비)
+- `TRACK=DESIGN`이면:
+  - `./pipline-kit/0_PROCESS_CONCERNS.md`를 준수한다.
+  - MAJOR와 동일하게 TRD → API → PLAN → FINAL_MERGE → BACKLOG 확정까지 수행한다.
+  - BACKLOG 확정 완료 후 즉시 Phase=DONE으로 종료한다(Sprint 진행 안 함).
+  - STATE.md에 다음을 기록:
+    - Track: DESIGN
+    - Phase: DONE
+    - NextStep: `/autopilot TRACK=BUILD CYCLE_LABEL={CYCLE_LABEL}` 로 Sprint 구현 시작
+  - 종료 메시지: "BACKLOG 확정 완료. Codex 투입 준비됨.\n→ `/autopilot TRACK=BUILD` 로 구현을 시작하세요."
+
+B) BUILD 트랙 (구현 전용 — Codex 병렬 워커 활용)
+- `TRACK=BUILD`이면:
+  - 먼저 `${WORK_CYCLE_ROOT}/final/BACKLOG.md`가 존재하는지 확인한다.
+    - 없으면 `BLOCKED: BACKLOG_REQUIRED — DESIGN을 먼저 실행하세요.`
+  - STATE.md를 읽어 이전 DESIGN 사이클의 컨텍스트를 복원한다.
+  - Sprint 루프를 아래 방식으로 실행한다:
+    - 각 Sprint의 Task를 **독립 실행 가능한 단위**로 분해한다.
+    - 독립 태스크들을 Agent(isolation=worktree)로 **병렬 투입**한다.
+      - 각 Agent에게 전달: Stack Contract, 해당 Task 명세, DoD, 관련 파일 경로
+    - 모든 Agent 완료 후 결과를 통합한다(충돌 해결, import 정리 등).
+    - SPRINT_QA: tsc + Vitest 통과 확인.
+  - FINAL_QA → CLEANUP 순으로 마무리한다.
 
 최종 출력(콘솔/채팅):
 - “무엇을 했는지”가 아니라 “현재 상태 + 다음 액션”만 간단히 요약한다.
